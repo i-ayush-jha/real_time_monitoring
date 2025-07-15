@@ -38,13 +38,16 @@ def parse_log_line(line):
 @st.cache_data(show_spinner=False)
 def load_logs():
     rows = []
-    with open(LOG_FILE, encoding="utf-8") as f:
-        for line in f:
-            dt, level, txt = parse_log_line(line)
-            if dt:
-                rows.append({"datetime": dt, "level": level, "text": txt})
-    df = pd.DataFrame(rows)
-    return df.sort_values("datetime", ascending=False).reset_index(drop=True)
+    try:
+        with open(LOG_FILE, encoding="utf-8") as f:
+            for line in f:
+                dt, level, txt = parse_log_line(line)
+                if dt:
+                    rows.append({"datetime": dt, "level": level, "text": txt})
+        df = pd.DataFrame(rows)
+        return df.sort_values("datetime", ascending=False).reset_index(drop=True)
+    except FileNotFoundError:
+        return pd.DataFrame(columns=["datetime", "level", "text"])
 
 def logs_to_text(df):
     return "\n".join(df["text"].tolist())
@@ -110,9 +113,14 @@ with st.sidebar:
 
 # ---- Load Logs ----
 df = load_logs()
+if df.empty:
+    st.warning(f"No log entries found in {LOG_FILE}! Please run log fetching first.")
+    st.stop()
 
-# ---- Date Filter ----
-if not df.empty:
+# ---- Show All Logs Checkbox & Date Filter ----
+show_all = st.sidebar.checkbox("Show all logs (ignore date filter)", value=False)
+
+if not show_all:
     min_date = df["datetime"].min().date()
     max_date = df["datetime"].max().date()
     date_range = st.sidebar.date_input("Select date range", [min_date, max_date], min_value=min_date, max_value=max_date)
@@ -121,9 +129,6 @@ if not df.empty:
     else:
         start_date = end_date = date_range
     df = df[(df["datetime"].dt.date >= start_date) & (df["datetime"].dt.date <= end_date)]
-else:
-    st.warning("No log entries found!")
-    st.stop()
 
 # ---- Log Type Filter ----
 st.sidebar.markdown("### Log Level Filter")
@@ -270,7 +275,7 @@ if not agg_df.empty and agg_df.shape[0] > 4:
 else:
     st.info("Not enough data for ML anomaly detection (need at least 5 intervals).")
 
-# ---- Logs Pagination ----
+# ---- Logs Pagination & Pretty View ----
 st.markdown("---")
 st.subheader("Log Viewer")
 if not df.empty:
@@ -287,4 +292,3 @@ else:
     st.info("No log lines for selected filter/search/date.")
 
 st.caption("CloudWatch Log Dashboard · Powered by Streamlit · All times in IST.")
-
