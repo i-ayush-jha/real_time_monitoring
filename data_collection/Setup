@@ -1,0 +1,71 @@
+# Real-Time Application Error Prediction System
+
+## 📌 Project Overview
+
+A real-time ML system to fetch, monitor, and analyze AWS CloudWatch logs, predict application errors, trigger alerts (email), and visualize/analyze logs and anomalies on a dashboard.
+
+## 🚀 Features
+
+- Automated fetching and saving of CloudWatch logs (with cron)
+- Interactive dashboard (Streamlit) for log viewing, filtering, searching
+- Anomaly detection (Z-score + ML/Isolation Forest)
+- Email alerting (manual & automated)
+- Download logs (txt & Excel)
+- Easy deployment on AWS EC2
+
+## 🛠️ Tech Stack
+
+- Python (pandas, streamlit, boto3, scikit-learn, matplotlib)
+- AWS CloudWatch, SES
+- Linux (EC2 Amazon Linux 2)
+- Cron for automation
+
+## ⚡ Quickstart
+
+1. **Clone this repo on your EC2:**
+
+2. **Install dependencies:**
+
+3. **Configure IAM Role on EC2 with CloudWatch and SES permissions.**
+
+4. **Configure your SES email and AWS region in `dashboard.py`.**
+
+5. **(Optional) Setup cron job for automated log fetching:**
+Add:
+
+6. **Run the dashboard:**
+Or, for HTTPS:
+streamlit run dashboard.py --server.enableCORS false --server.enableXsrfProtection false --server.sslCertfile cert.pem --server.sslKeyfile key.pem
+
+
+
+7. **Open in browser:**  
+
+
+## 📂 Project Structure
+
+real_time_monitoring/
+├── data_collection/
+│ ├── fetch_cloudwatch_logs.py
+│ ├── output_logs.txt
+│ └── dashboard.py
+├── requirements.txt
+├── README.md
+
+
+## 🔔 Automation
+
+- **Logs are fetched automatically every 5 minutes via cron.**
+- **Dashboard auto-refreshes based on sidebar settings.**
+- **Email alerts can be triggered from dashboard.**
+
+## 🛡️ Security
+
+- Restrict EC2 Security Group to your IP.
+- Use HTTPS for Streamlit dashboard in production.
+- Use IAM roles (never store AWS keys in code).
+
+## 👤 Author
+
+- Ayush Kumar Jha
+- ayush.kumar@axcess.io

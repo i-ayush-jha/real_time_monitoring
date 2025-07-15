@@ -1,0 +1,8 @@
+streamlit
+pandas
+numpy
+matplotlib
+pytz
+boto3
+scikit-learn
+xlsxwriter
